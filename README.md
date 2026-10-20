@@ -29,3 +29,5 @@ Windows-десктоп: Dear ImGui поверх DirectX 11 + Win32, без Pytho
 Бесплатный ключ можно получить на https://www.virustotal.com/gui/join-us — учтите лимиты
 бесплатного тарифа (4 запроса/мин, 500/день), они не проверяются программой на лету,
 только отображается локальный счётчик использованных запросов.
+
+<img width="852" height="480" alt="doc_2026-09-13_16-23-13" src="https://github.com/user-attachments/assets/b7ffb809-75af-4e5f-be69-29a1987d6fff" />
