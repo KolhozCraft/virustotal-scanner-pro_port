@@ -1,0 +1,931 @@
+import { LineEdit, TextEdit, Palette } from "std-widgets.slint";
+
+export global Cfg {
+    in-out property <bool> topmost;
+    in-out property <string> theme: "dark";
+    in-out property <bool> sound-on-complete: true;
+    in-out property <string> api-type: "free";
+    in-out property <string> lang: "ru";
+    in-out property <bool> close-to-tray;
+    in-out property <bool> autostart;
+    callback f7sua4gyqbn();
+}
+
+export global Tr {
+    pure callback fw9qy2wz84z(string, string) -> string;
+    pure public function f3if9jqdip5(key: string) -> string {
+        return Tr.fw9qy2wz84z(Cfg.lang, key);
+    }
+}
+
+export global UiFlags {
+    in-out property <bool> show-settings;
+    in-out property <bool> show-api-key;
+    in-out property <bool> show-about;
+    in-out property <bool> show-thanks;
+}
+
+export global AppState {
+    in property <bool> scanning;
+    in property <bool> has-file;
+    in property <bool> rescan-enabled;
+    in property <string> file-name;
+    in property <string> file-size-text;
+    in property <string> file-hash-text;
+    in property <string> status-text;
+    in property <string> output-log;
+    in property <float> progress;
+    in property <bool> show-check-now;
+    in property <int> requests-used;
+    in-out property <string> api-key-input;
+    in-out property <bool> thanks-dont-show;
+}
+
+export global Actions {
+    callback fnhej4hffkb();
+    callback fkjezlxswmu();
+    callback fvum2ylkwsn();
+    callback f87pe0lfx7z();
+    callback folpjypdhbi();
+    callback fned47nvlvc();
+    callback f4v66wk7b5u();
+    callback fhg6wxr8spi();
+    callback fa45wv5xq9g();
+    callback fp1tj5nd0tc();
+    callback f506mozbyu6(bool);
+}
+
+global Theme {
+    out property <bool> dark: Cfg.theme == "dark";
+    out property <color> bg: dark ? #0d1016 : #eceff5;
+    out property <color> surface: dark ? #151a23 : #ffffff;
+    out property <color> surface-alt: dark ? #1d2430 : #f0f3f8;
+    out property <color> surface-hover: dark ? #263042 : #e4e9f2;
+    out property <color> surface-press: dark ? #2e3a50 : #d8dfec;
+    out property <color> border: dark ? #263041 : #dbe1ec;
+    out property <color> text: dark ? #e7ebf3 : #19212e;
+    out property <color> dim: dark ? #8994a8 : #667189;
+    out property <color> accent: dark ? #4f8cff : #2f6df0;
+    out property <color> accent-hover: dark ? #6a9fff : #4a82f5;
+    out property <color> accent-press: dark ? #3b74e3 : #2457c9;
+    out property <color> success: dark ? #3ddc97 : #1fa971;
+    out property <color> overlay: dark ? #000000b8 : #10182860;
+}
+
+component Section inherits Text {
+    font-size: 12px;
+    font-weight: 700;
+    color: Theme.dim;
+    animate color { duration: 250ms; }
+}
+
+component Btn inherits Rectangle {
+    in property <string> text;
+    in property <bool> primary;
+    in property <bool> enabled: true;
+    in property <bool> flash;
+    callback clicked();
+    height: 36px;
+    border-radius: 9px;
+    border-width: root.primary ? 0px : 1px;
+    border-color: root.flash ? Theme.success : (area.has-hover && root.enabled ? Theme.accent : Theme.border);
+    background: !root.enabled ? Theme.surface-alt : (root.primary ? (area.pressed ? Theme.accent-press : (area.has-hover ? Theme.accent-hover : Theme.accent)) : (area.pressed ? Theme.surface-press : (area.has-hover ? Theme.surface-hover : Theme.surface-alt)));
+    opacity: root.enabled ? 1.0 : 0.45;
+    transform-scale: area.pressed && root.enabled ? 0.97 : 1.0;
+    animate background { duration: 140ms; easing: ease-out; }
+    animate border-color { duration: 140ms; easing: ease-out; }
+    animate opacity { duration: 160ms; }
+    animate transform-scale { duration: 90ms; easing: ease-out; }
+
+    Text {
+        text: root.text;
+        font-size: 14px;
+        font-weight: root.primary ? 700 : 500;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+        color: root.primary ? #ffffff : (root.flash ? Theme.success : Theme.text);
+        animate color { duration: 140ms; }
+    }
+
+    area := TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: pointer;
+        clicked => {
+            root.clicked();
+        }
+    }
+}
+
+component Radio inherits Rectangle {
+    in property <string> label;
+    in property <bool> checked;
+    callback ffcrk7nwqy8();
+    height: 28px;
+    preferred-width: 28px + caption.preferred-width;
+
+    ring := Rectangle {
+        x: 0px;
+        y: (parent.height - self.height) / 2;
+        width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        border-width: 2px;
+        border-color: root.checked ? Theme.accent : (area.has-hover ? Theme.dim : Theme.border);
+        animate border-color { duration: 150ms; }
+
+        Rectangle {
+            width: root.checked ? 10px : 0px;
+            height: root.checked ? 10px : 0px;
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            border-radius: 5px;
+            background: Theme.accent;
+            animate width { duration: 180ms; easing: ease-out; }
+            animate height { duration: 180ms; easing: ease-out; }
+        }
+    }
+
+    caption := Text {
+        x: 28px;
+        height: parent.height;
+        text: root.label;
+        font-size: 14px;
+        vertical-alignment: center;
+        color: Theme.text;
+    }
+
+    area := TouchArea {
+        mouse-cursor: pointer;
+        clicked => {
+            root.ffcrk7nwqy8();
+        }
+    }
+}
+
+component Check inherits Rectangle {
+    in property <string> text;
+    in-out property <bool> checked;
+    callback toggled();
+    height: 30px;
+    preferred-width: 30px + caption.preferred-width;
+
+    Rectangle {
+        x: 0px;
+        y: (parent.height - self.height) / 2;
+        width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        border-width: 2px;
+        border-color: root.checked ? Theme.accent : (area.has-hover ? Theme.dim : Theme.border);
+        background: root.checked ? Theme.accent : transparent;
+        animate background { duration: 150ms; easing: ease-out; }
+        animate border-color { duration: 150ms; }
+
+        Path {
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            width: 12px;
+            height: 12px;
+            viewbox-width: 12;
+            viewbox-height: 12;
+            commands: "M 1.5 6.5 L 4.8 9.8 L 10.5 2.8";
+            stroke: #ffffff;
+            stroke-width: 2px;
+            stroke-line-cap: round;
+            stroke-line-join: round;
+            opacity: root.checked ? 1.0 : 0.0;
+            animate opacity { duration: 140ms; }
+        }
+    }
+
+    caption := Text {
+        x: 30px;
+        height: parent.height;
+        text: root.text;
+        font-size: 14px;
+        vertical-alignment: center;
+        color: Theme.text;
+    }
+
+    area := TouchArea {
+        mouse-cursor: pointer;
+        clicked => {
+            root.checked = !root.checked;
+            root.toggled();
+        }
+    }
+}
+
+component MenuEntry inherits Rectangle {
+    in property <string> text;
+    callback clicked();
+    height: 36px;
+    border-radius: 7px;
+    background: area.pressed ? Theme.surface-press : (area.has-hover ? Theme.surface-hover : transparent);
+    animate background { duration: 120ms; }
+
+    Text {
+        x: 12px;
+        height: parent.height;
+        text: root.text;
+        font-size: 14px;
+        vertical-alignment: center;
+        color: Theme.text;
+    }
+
+    area := TouchArea {
+        mouse-cursor: pointer;
+        clicked => {
+            root.clicked();
+        }
+    }
+}
+
+component StatusDot inherits Rectangle {
+    in property <bool> active;
+    in property <color> tint;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background: root.tint;
+    opacity: root.active ? 0.55 + 0.45 * Math.sin((animation-tick() / 1.1s) * 360deg) : 1.0;
+    animate background { duration: 300ms; }
+}
+
+component Bar inherits Rectangle {
+    in property <float> progress;
+    in property <bool> busy;
+    height: 8px;
+    border-radius: 4px;
+    background: Theme.surface-alt;
+    clip: true;
+    animate background { duration: 250ms; }
+
+    Rectangle {
+        x: 0px;
+        width: root.width * Math.min(Math.max(root.progress, 0.0), 1.0);
+        height: parent.height;
+        border-radius: 4px;
+        background: root.progress >= 1.0 ? Theme.success : Theme.accent;
+        animate width { duration: 380ms; easing: ease-out; }
+        animate background { duration: 300ms; }
+    }
+
+    if root.busy: Rectangle {
+        width: parent.width * 0.28;
+        height: parent.height;
+        border-radius: 4px;
+        x: -self.width + (parent.width + self.width) * Math.mod(animation-tick() / 1.5s, 1.0);
+        background: #ffffff38;
+    }
+}
+
+component Modal inherits Rectangle {
+    in property <bool> open;
+    in property <string> title;
+    in property <length> card-width: 440px;
+    in property <length> card-height: 200px;
+    callback fnmcqxer628();
+    background: Theme.overlay;
+    opacity: root.open ? 1.0 : 0.0;
+    visible: root.opacity > 0.01;
+    animate opacity { duration: 200ms; easing: ease-out; }
+
+    TouchArea { }
+
+    Rectangle {
+        width: min(root.card-width, root.width - 24px);
+        height: min(root.card-height, root.height - 24px);
+        x: (root.width - self.width) / 2;
+        y: (root.height - self.height) / 2 + (root.open ? 0px : 18px);
+        background: Theme.surface;
+        border-radius: 14px;
+        border-width: 1px;
+        border-color: Theme.border;
+        drop-shadow-blur: 32px;
+        drop-shadow-color: #00000070;
+        drop-shadow-offset-y: 8px;
+        transform-scale: root.open ? 1.0 : 0.96;
+        animate y { duration: 240ms; easing: ease-out; }
+        animate transform-scale { duration: 240ms; easing: ease-out; }
+        animate background { duration: 250ms; }
+
+        VerticalLayout {
+            padding: 20px;
+            spacing: 10px;
+            alignment: start;
+
+            HorizontalLayout {
+                height: 34px;
+                Text {
+                    text: root.title;
+                    font-size: 18px;
+                    font-weight: 700;
+                    vertical-alignment: center;
+                    color: Theme.text;
+                }
+                Rectangle { }
+                Btn {
+                    text: "X";
+                    width: 34px;
+                    height: 34px;
+                    clicked => {
+                        root.fnmcqxer628();
+                    }
+                }
+            }
+
+            @children
+        }
+    }
+}
+
+component SettingsModal inherits Modal {
+    title: Tr.f3if9jqdip5("settings");
+    card-width: 460px;
+    card-height: 496px;
+    fnmcqxer628 => {
+        Actions.fhg6wxr8spi();
+        UiFlags.show-settings = false;
+    }
+
+    Check {
+        text: Tr.f3if9jqdip5("topmost");
+        checked <=> Cfg.topmost;
+        toggled => {
+            Cfg.f7sua4gyqbn();
+        }
+    }
+    Section { text: Tr.f3if9jqdip5("theme"); }
+    HorizontalLayout {
+        spacing: 20px;
+        alignment: start;
+        Radio {
+            label: Tr.f3if9jqdip5("dark");
+            checked: Cfg.theme == "dark";
+            ffcrk7nwqy8 => {
+                Cfg.theme = "dark";
+                Cfg.f7sua4gyqbn();
+            }
+        }
+        Radio {
+            label: Tr.f3if9jqdip5("light");
+            checked: Cfg.theme == "light";
+            ffcrk7nwqy8 => {
+                Cfg.theme = "light";
+                Cfg.f7sua4gyqbn();
+            }
+        }
+    }
+    Check {
+        text: Tr.f3if9jqdip5("sound");
+        checked <=> Cfg.sound-on-complete;
+        toggled => {
+            Cfg.f7sua4gyqbn();
+        }
+    }
+    Section { text: Tr.f3if9jqdip5("api_type"); }
+    HorizontalLayout {
+        spacing: 20px;
+        alignment: start;
+        Radio {
+            label: Tr.f3if9jqdip5("free");
+            checked: Cfg.api-type == "free";
+            ffcrk7nwqy8 => {
+                Cfg.api-type = "free";
+                Cfg.f7sua4gyqbn();
+            }
+        }
+        Radio {
+            label: Tr.f3if9jqdip5("paid");
+            checked: Cfg.api-type == "paid";
+            ffcrk7nwqy8 => {
+                Cfg.api-type = "paid";
+                Cfg.f7sua4gyqbn();
+            }
+        }
+    }
+    Section { text: Tr.f3if9jqdip5("language"); }
+    HorizontalLayout {
+        spacing: 20px;
+        alignment: start;
+        Radio {
+            label: Tr.f3if9jqdip5("lang_ru");
+            checked: Cfg.lang == "ru";
+            ffcrk7nwqy8 => {
+                Cfg.lang = "ru";
+                Cfg.f7sua4gyqbn();
+            }
+        }
+        Radio {
+            label: Tr.f3if9jqdip5("lang_en");
+            checked: Cfg.lang == "en";
+            ffcrk7nwqy8 => {
+                Cfg.lang = "en";
+                Cfg.f7sua4gyqbn();
+            }
+        }
+    }
+    Section { text: Tr.f3if9jqdip5("behavior"); }
+    Check {
+        text: Tr.f3if9jqdip5("close_to_tray");
+        checked <=> Cfg.close-to-tray;
+        toggled => {
+            Cfg.f7sua4gyqbn();
+        }
+    }
+    Check {
+        text: Tr.f3if9jqdip5("autostart");
+        checked <=> Cfg.autostart;
+        toggled => {
+            Cfg.f7sua4gyqbn();
+        }
+    }
+    HorizontalLayout {
+        spacing: 10px;
+        alignment: start;
+        Btn {
+            text: Tr.f3if9jqdip5("save");
+            width: 130px;
+            primary: true;
+            clicked => {
+                Actions.f4v66wk7b5u();
+                UiFlags.show-settings = false;
+            }
+        }
+        Btn {
+            text: Tr.f3if9jqdip5("cancel");
+            width: 130px;
+            clicked => {
+                Actions.fhg6wxr8spi();
+                UiFlags.show-settings = false;
+            }
+        }
+    }
+}
+
+component ApiKeyModal inherits Modal {
+    title: Tr.f3if9jqdip5("api_key_dialog_title");
+    card-width: 500px;
+    card-height: 196px;
+    fnmcqxer628 => {
+        Actions.fp1tj5nd0tc();
+        UiFlags.show-api-key = false;
+    }
+
+    Text {
+        text: Tr.f3if9jqdip5("api_key_dialog_text");
+        font-size: 14px;
+        wrap: word-wrap;
+        color: Theme.dim;
+    }
+    LineEdit {
+        text <=> AppState.api-key-input;
+        input-type: password;
+    }
+    HorizontalLayout {
+        spacing: 10px;
+        alignment: start;
+        Btn {
+            text: Tr.f3if9jqdip5("ok");
+            width: 130px;
+            primary: true;
+            clicked => {
+                Actions.fa45wv5xq9g();
+                UiFlags.show-api-key = false;
+            }
+        }
+        Btn {
+            text: Tr.f3if9jqdip5("cancel");
+            width: 130px;
+            clicked => {
+                Actions.fp1tj5nd0tc();
+                UiFlags.show-api-key = false;
+            }
+        }
+    }
+}
+
+component AboutModal inherits Modal {
+    title: Tr.f3if9jqdip5("about_program");
+    card-width: 540px;
+    card-height: 360px;
+    fnmcqxer628 => {
+        UiFlags.show-about = false;
+    }
+
+    Text {
+        text: Tr.f3if9jqdip5("about_text");
+        font-size: 14px;
+        wrap: word-wrap;
+        height: 230px;
+        vertical-alignment: top;
+        color: Theme.text;
+    }
+    HorizontalLayout {
+        alignment: start;
+        Btn {
+            text: Tr.f3if9jqdip5("ok");
+            width: 130px;
+            primary: true;
+            clicked => {
+                UiFlags.show-about = false;
+            }
+        }
+    }
+}
+
+component ThanksModal inherits Modal {
+    title: Tr.f3if9jqdip5("thanks_title");
+    card-width: 480px;
+    card-height: 280px;
+    fnmcqxer628 => {
+        UiFlags.show-thanks = false;
+        Actions.f506mozbyu6(AppState.thanks-dont-show);
+    }
+
+    Text {
+        text: Tr.f3if9jqdip5("thanks_body");
+        font-size: 24px;
+        font-weight: 700;
+        color: Theme.success;
+    }
+    Text {
+        text: Tr.f3if9jqdip5("thanks_subtext");
+        font-size: 14px;
+        wrap: word-wrap;
+        height: 46px;
+        color: Theme.dim;
+    }
+    Check {
+        text: Tr.f3if9jqdip5("dont_show_again");
+        checked <=> AppState.thanks-dont-show;
+    }
+    HorizontalLayout {
+        alignment: start;
+        Btn {
+            text: Tr.f3if9jqdip5("ok");
+            width: 160px;
+            primary: true;
+            clicked => {
+                UiFlags.show-thanks = false;
+                Actions.f506mozbyu6(AppState.thanks-dont-show);
+            }
+        }
+    }
+}
+
+export component MainWindow inherits Window {
+    title: "VirusTotal Scanner Pro";
+    icon: @image-url("app.png");
+    preferred-width: 1100px;
+    preferred-height: 720px;
+    min-width: 780px;
+    min-height: 580px;
+    always-on-top: Cfg.topmost;
+    background: Theme.bg;
+    animate background { duration: 280ms; }
+
+    property <bool> menu-open;
+    property <bool> intro-ready;
+    property <float> intro: root.intro-ready ? 1.0 : 0.0;
+    property <bool> copied;
+    animate intro { duration: 520ms; easing: ease-out; }
+
+    init => {
+        Palette.color-scheme = Theme.dark ? ColorScheme.dark : ColorScheme.light;
+    }
+
+    changed dark => {
+        Palette.color-scheme = Theme.dark ? ColorScheme.dark : ColorScheme.light;
+    }
+
+    property <bool> dark: Theme.dark;
+
+    intro-timer := Timer {
+        interval: 40ms;
+        running: true;
+        triggered => {
+            root.intro-ready = true;
+            self.running = false;
+        }
+    }
+
+    copy-timer := Timer {
+        interval: 1500ms;
+        running: root.copied;
+        triggered => {
+            root.copied = false;
+        }
+    }
+
+    Rectangle {
+        opacity: root.intro;
+        y: (1.0 - root.intro) * 14px;
+
+        VerticalLayout {
+            Rectangle {
+                height: 58px;
+
+                HorizontalLayout {
+                    padding-left: 18px;
+                    padding-right: 18px;
+                    padding-top: 12px;
+                    padding-bottom: 8px;
+                    spacing: 10px;
+
+                    Image {
+                        source: @image-url("app.png");
+                        width: 30px;
+                        height: 30px;
+                        image-fit: contain;
+                        y: (parent.height - self.height) / 2;
+                    }
+                    Text {
+                        text: "VirusTotal Scanner Pro";
+                        font-size: 17px;
+                        font-weight: 700;
+                        vertical-alignment: center;
+                        color: Theme.text;
+                        animate color { duration: 250ms; }
+                    }
+                    Rectangle { }
+                    Rectangle {
+                        width: chip-text.preferred-width + 28px;
+                        height: 30px;
+                        y: (parent.height - self.height) / 2;
+                        border-radius: 15px;
+                        background: Theme.surface;
+                        border-width: 1px;
+                        border-color: Theme.border;
+                        animate background { duration: 250ms; }
+                        chip-text := Text {
+                            text: Tr.f3if9jqdip5("requests_used") + ": " + AppState.requests-used;
+                            font-size: 13px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                            color: Theme.dim;
+                        }
+                    }
+                    Btn {
+                        text: Tr.f3if9jqdip5("actions");
+                        width: 130px;
+                        height: 34px;
+                        y: (parent.height - self.height) / 2;
+                        clicked => {
+                            root.menu-open = !root.menu-open;
+                        }
+                    }
+                }
+            }
+
+            HorizontalLayout {
+                padding-left: 14px;
+                padding-right: 14px;
+                padding-bottom: 14px;
+                spacing: 14px;
+
+                Rectangle {
+                    width: 330px;
+                    background: Theme.surface;
+                    border-radius: 14px;
+                    border-width: 1px;
+                    border-color: Theme.border;
+                    animate background { duration: 250ms; }
+
+                    VerticalLayout {
+                        padding: 18px;
+                        spacing: 10px;
+                        alignment: start;
+
+                        Section { text: Tr.f3if9jqdip5("file_info"); }
+
+                        Rectangle {
+                            height: 118px;
+
+                            Rectangle {
+                                opacity: AppState.has-file ? 1.0 : 0.0;
+                                animate opacity { duration: 260ms; easing: ease-out; }
+
+                                VerticalLayout {
+                                    spacing: 4px;
+                                    alignment: start;
+                                    Text {
+                                        text: AppState.file-name;
+                                        font-size: 15px;
+                                        font-weight: 700;
+                                        wrap: word-wrap;
+                                        color: Theme.text;
+                                    }
+                                    Text {
+                                        text: AppState.file-size-text;
+                                        font-size: 13px;
+                                        color: Theme.dim;
+                                    }
+                                    Text {
+                                        text: AppState.file-hash-text;
+                                        font-size: 12px;
+                                        wrap: char-wrap;
+                                        color: Theme.dim;
+                                    }
+                                }
+                            }
+
+                            Text {
+                                text: Tr.f3if9jqdip5("no_file");
+                                font-size: 14px;
+                                color: Theme.dim;
+                                opacity: AppState.has-file ? 0.0 : 1.0;
+                                animate opacity { duration: 260ms; easing: ease-out; }
+                            }
+                        }
+
+                        Section { text: Tr.f3if9jqdip5("actions"); }
+
+                        Btn {
+                            text: Tr.f3if9jqdip5("select_file");
+                            primary: true;
+                            height: 42px;
+                            enabled: !AppState.scanning;
+                            clicked => {
+                                Actions.fnhej4hffkb();
+                            }
+                        }
+                        Btn {
+                            text: Tr.f3if9jqdip5("rescan");
+                            enabled: !AppState.scanning && AppState.rescan-enabled;
+                            clicked => {
+                                Actions.fkjezlxswmu();
+                            }
+                        }
+                        HorizontalLayout {
+                            spacing: 8px;
+                            Btn {
+                                text: root.copied ? Tr.f3if9jqdip5("copied") : Tr.f3if9jqdip5("copy_hash");
+                                flash: root.copied;
+                                clicked => {
+                                    Actions.fvum2ylkwsn();
+                                    root.copied = true;
+                                }
+                            }
+                            Btn {
+                                text: Tr.f3if9jqdip5("open_in_browser");
+                                clicked => {
+                                    Actions.f87pe0lfx7z();
+                                }
+                            }
+                        }
+                        Btn {
+                            text: Tr.f3if9jqdip5("clear");
+                            clicked => {
+                                Actions.folpjypdhbi();
+                            }
+                        }
+
+                        Rectangle {
+                            height: AppState.show-check-now ? 44px : 0px;
+                            opacity: AppState.show-check-now ? 1.0 : 0.0;
+                            clip: true;
+                            animate height { duration: 240ms; easing: ease-out; }
+                            animate opacity { duration: 240ms; easing: ease-out; }
+
+                            Btn {
+                                y: 6px;
+                                text: Tr.f3if9jqdip5("check_now");
+                                primary: true;
+                                clicked => {
+                                    Actions.fned47nvlvc();
+                                }
+                            }
+                        }
+
+                        Section { text: Tr.f3if9jqdip5("status"); }
+
+                        HorizontalLayout {
+                            spacing: 10px;
+                            alignment: start;
+                            StatusDot {
+                                y: 5px;
+                                active: AppState.scanning;
+                                tint: AppState.scanning ? Theme.accent : (AppState.progress >= 1.0 ? Theme.success : Theme.dim);
+                            }
+                            Text {
+                                text: AppState.status-text;
+                                font-size: 14px;
+                                wrap: word-wrap;
+                                color: Theme.text;
+                            }
+                        }
+
+                        Bar {
+                            progress: AppState.progress;
+                            busy: AppState.scanning;
+                        }
+                        Text {
+                            text: Math.round(AppState.progress * 100) + "%";
+                            font-size: 12px;
+                            horizontal-alignment: right;
+                            color: Theme.dim;
+                        }
+                    }
+                }
+
+                Rectangle {
+                    background: Theme.surface;
+                    border-radius: 14px;
+                    border-width: 1px;
+                    border-color: Theme.border;
+                    animate background { duration: 250ms; }
+
+                    VerticalLayout {
+                        padding: 18px;
+                        spacing: 10px;
+
+                        Section { text: Tr.f3if9jqdip5("results"); }
+                        TextEdit {
+                            read-only: true;
+                            wrap: word-wrap;
+                            text: AppState.output-log;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        width: root.width;
+        height: root.height;
+        visible: root.menu-open;
+        TouchArea {
+            clicked => {
+                root.menu-open = false;
+            }
+        }
+    }
+
+    Rectangle {
+        width: 230px;
+        height: 124px;
+        x: root.width - self.width - 18px;
+        y: 54px + (root.menu-open ? 0px : -8px);
+        opacity: root.menu-open ? 1.0 : 0.0;
+        visible: self.opacity > 0.01;
+        background: Theme.surface;
+        border-radius: 12px;
+        border-width: 1px;
+        border-color: Theme.border;
+        drop-shadow-blur: 20px;
+        drop-shadow-color: #00000060;
+        drop-shadow-offset-y: 6px;
+        animate opacity { duration: 170ms; easing: ease-out; }
+        animate y { duration: 170ms; easing: ease-out; }
+
+        VerticalLayout {
+            padding: 6px;
+            spacing: 2px;
+            MenuEntry {
+                text: Tr.f3if9jqdip5("change_api_key");
+                clicked => {
+                    root.menu-open = false;
+                    UiFlags.show-api-key = true;
+                }
+            }
+            MenuEntry {
+                text: Tr.f3if9jqdip5("settings");
+                clicked => {
+                    root.menu-open = false;
+                    UiFlags.show-settings = true;
+                }
+            }
+            MenuEntry {
+                text: Tr.f3if9jqdip5("about");
+                clicked => {
+                    root.menu-open = false;
+                    UiFlags.show-about = true;
+                }
+            }
+        }
+    }
+
+    SettingsModal {
+        width: root.width;
+        height: root.height;
+        open: UiFlags.show-settings;
+    }
+    ApiKeyModal {
+        width: root.width;
+        height: root.height;
+        open: UiFlags.show-api-key;
+    }
+    AboutModal {
+        width: root.width;
+        height: root.height;
+        open: UiFlags.show-about;
+    }
+    ThanksModal {
+        width: root.width;
+        height: root.height;
+        open: UiFlags.show-thanks;
+    }
+}
