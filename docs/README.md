@@ -1,9 +1,9 @@
 <img width="1672" height="941" alt="37812634-905d-498b-87e0-99deb53be189" src="https://github.com/user-attachments/assets/5a6c9e5a-f8a9-44a0-b0f9-f3d6cf0abafb" />
 
-# VirusTotal Scanner Pro — C++ / Dear ImGui + DirectX 11
+# VirusTotal Scanner Pro — Rust+C++ / Slint
 
 Портирован с оригинального Python/customtkinter-приложения (`virustotal.py`) на нативный
-Windows-десктоп: Dear ImGui поверх DirectX 11 + Win32, без Python-рантайма.
+Windows-десктоп: Slint, С++, Rust.
 
 ## Что сохранено из оригинала
 
@@ -14,14 +14,7 @@ Windows-десктоп: Dear ImGui поверх DirectX 11 + Win32, без Pytho
 - Настройки: тема (тёмная/светлая), звук по завершении, тип API-ключа, язык (RU/EN),
   «поверх всех окон», счётчик использованных запросов за день (сбрасывается ежедневно).
 - Диалог ввода/смены API-ключа, копирование хеша, открытие отчёта в браузере.
-- Конфиг хранится в `%LOCALAPPDATA%\VirusTotalScanner\vt_config.json` — как и раньше.
-
-## Чего нет (сознательно упрощено при портировании)
-
-- Иконки эмодзи заменены на текстовые пометки (`[M]`/`[S]`, `!!`, `===`) — стандартный
-  шрифт Dear ImGui/Segoe UI не рендерит цветные эмодзи.
-- Системный трей и автозапуск с Windows не реализованы (были заглушками и в оригинале).
-- Диалог "Спасибо за скачивание" не перенесён.
+- Конфиг хранится в `%LOCALAPPDATA%\ky4ka_boroxla\VirusTotalScanner\vt_config.json` — теперь по новому.
 
 ## Первый запуск
 
