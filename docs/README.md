@@ -23,4 +23,4 @@ Windows-десктоп: Slint, С++, Rust.
 бесплатного тарифа (4 запроса/мин, 500/день), они не проверяются программой на лету,
 только отображается локальный счётчик использованных запросов.
 
-<img width="852" height="480" alt="doc_2026-09-13_16-23-13" src="https://github.com/user-attachments/assets/b7ffb809-75af-4e5f-be69-29a1987d6fff" />
+<img width="165" height="165" alt="67-pig-sigma-pig" src="https://github.com/user-attachments/assets/7cccf3a9-1ee3-47ce-bb27-101ca6db2d0d" />
