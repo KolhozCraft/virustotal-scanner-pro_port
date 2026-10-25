@@ -1,0 +1,34 @@
+![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/KolhozCraft/virustotal-scanner-pro_port)
+![GitHub](https://img.shields.io/github/license/KolhozCraft/virustotal-scanner-pro_port)
+![GitHub issues](https://img.shields.io/github/issues/KolhozCraft/virustotal-scanner-pro_port)
+![Rust](https://img.shields.io/badge/Rust-49.1%25-c98b6b)
+![Slint](https://img.shields.io/badge/Slint-29.3%25-1f6feb)
+![C%2B%2B](https://img.shields.io/badge/C%2B%2B-20.3%25-f85189)
+![C](https://img.shields.io/badge/C-1.3%25-444444)
+
+<img width="1672" height="941" alt="37812634-905d-498b-87e0-99deb53be189" src="https://github.com/user-attachments/assets/5a6c9e5a-f8a9-44a0-b0f9-f3d6cf0abafb" />
+
+# VirusTotal Scanner Pro — Rust+C++ / Slint
+
+Портирован с оригинального Python/customtkinter-приложения (`virustotal.py`) на нативный
+Windows-десктоп: Slint, С++, Rust.
+
+## Что сохранено из оригинала
+
+- Проверка файла по SHA-256 в базе VirusTotal, при отсутствии — загрузка и опрос анализа.
+- Полный отчёт: статистика (harmless/undetected/suspicious/malicious/timeout), список
+  сработавших антивирусов с методом детекта, репутация файла, голоса сообщества, комментарии.
+- Кнопка «Проверить сейчас» во время ожидания анализа.
+- Настройки: тема (тёмная/светлая), звук по завершении, тип API-ключа, язык (RU/EN),
+  «поверх всех окон», счётчик использованных запросов за день (сбрасывается ежедневно).
+- Диалог ввода/смены API-ключа, копирование хеша, открытие отчёта в браузере.
+- Конфиг хранится в `%LOCALAPPDATA%\ky4ka_boroxla\VirusTotalScanner\vt_config.json` — теперь по новому.
+
+## Первый запуск
+
+При первом запуске, если API-ключ не сохранён, сразу откроется диалог его ввода.
+Бесплатный ключ можно получить на https://www.virustotal.com/gui/join-us — учтите лимиты
+бесплатного тарифа (4 запроса/мин, 500/день), они не проверяются программой на лету,
+только отображается локальный счётчик использованных запросов.
+
+<img width="165" height="165" alt="67-pig-sigma-pig" src="https://github.com/user-attachments/assets/7cccf3a9-1ee3-47ce-bb27-101ca6db2d0d" />
